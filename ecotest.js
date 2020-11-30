@@ -23,7 +23,6 @@ let clearInputs = async function(browser){
 }
 
 let findSmallerBowl = async function(barNumbers, browser){
-	console.log('find the smallest among: ', barNumbers)
 	let bowls = { left:[], right:[] }
 	let smallerBowl = null
 	// split the bars between the bowls. one will be left over
@@ -33,7 +32,6 @@ let findSmallerBowl = async function(barNumbers, browser){
 	}
 	for ( let bowl in bowls ) {
 		for ( let num = 0; num < bowls[bowl].length; num++ ) {
-			console.log('36', `#${bowl}_${num}`, bowls[bowl][num].toString())
 			await browser.setValue(`#${bowl}_${num}`, bowls[bowl][num].toString())
 		}
 	}
@@ -41,10 +39,8 @@ let findSmallerBowl = async function(barNumbers, browser){
 	await browser.click('#weigh')
 	await browser.pause(1000)
 	let weighingsString = (await browser.getText('.game-info ol'))
-	console.log('wei?', weighingsString)
 	let weighings = weighingsString.value.split('\n')
 	let lastWeighing = weighings[weighings.length - 1]
-	//console.log('wei?', lastWeighing)
 	if ( lastWeighing.includes('<') ) {
 		smallerBowl = bowls.left
 	}
@@ -56,10 +52,16 @@ let findSmallerBowl = async function(barNumbers, browser){
 		return barNumbers[0] 
 	}
 	else { throw Error('No fake gold was found.') }
-	console.log('smaller bowl? ', smallerBowl, bowls)
 	await clearInputs(browser)
 	await browser.pause(1000)
-	return findSmallerBowl(smallerBowl, browser)
+	if ( smallerBowl.length == 1 ) {
+		// if the smaller bowl has exactly one bar in it, then it must be the fake bar
+		return smallerBowl[0]
+	}
+	else {
+		// repeat the process on the smaller bowl
+		return findSmallerBowl(smallerBowl, browser)
+	}
 }
 
 module.exports.findFakeGold = async function(browser){
@@ -68,8 +70,15 @@ module.exports.findFakeGold = async function(browser){
 	await browser.url('http://ec2-54-208-152-154.compute-1.amazonaws.com/')
 	await browser.waitForElementVisible('#root')
 	let fakeBarNumber = await findSmallerBowl(barNumbers, browser)
-	console.log('???', fakeBarNumber)
+	let weighingsString = (await browser.getText('.game-info ol'))
+	let weighings = weighingsString.value.split('\n')
 	await browser.click(`#coin_${fakeBarNumber}`)
+	let alertText = await browser.getAlertText()
+	console.log(alertText.value)
+	console.log(`The fake bar was bar #${fakeBarNumber}`)
+	console.log('The following weighings were made: ')
+	console.log(`The bars were weighed ${weighings.length} times.`)
+	console.log(weighings)
 	await browser.end();
 }
 

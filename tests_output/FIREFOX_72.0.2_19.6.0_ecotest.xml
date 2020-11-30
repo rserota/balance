@@ -5,9 +5,9 @@
 
   <testsuite name="ecotest"
     errors="0" failures="0" hostname="" id="" package="ecotest" skipped="0"
-    tests="1" time="14.62" timestamp="">
+    tests="1" time="14.26" timestamp="">
   
-    <testcase name="findFakeGold" classname="ecotest" time="14.62" assertions="1">
+    <testcase name="findFakeGold" classname="ecotest" time="14.26" assertions="1">
 
     
     </testcase>
