@@ -1,0 +1,3 @@
+node_modules
+geckodriver.log
+tests_output
